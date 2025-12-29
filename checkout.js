@@ -1,5 +1,5 @@
-function getItems() {}
+function jsonToDict() {}
 function loadItems() {}
 function calculateItems() {}
 function specialPricingCalculation() {}
-function responseData() {}
+export function getTotal() {}
