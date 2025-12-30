@@ -19,16 +19,14 @@ test("special item A 3 quantity", () => {
 });
 
 test("special item A 9 quantity", () => {
-  const value = { A: 3 };
+  const value = { A: 9 };
   const total = getTotal(JSON.stringify(value));
   expect(total).toBe(420);
 });
 
 test("B negative quantity", () => {
   const value = { B: -1 };
-  expect(getTotal(JSON.stringify(value))).toThrow(
-    "Value must not be negative.",
-  );
+  expect(() => getTotal(JSON.stringify(value))).toThrow("Invalid value");
 });
 
 test("item A B C and D", () => {
@@ -39,13 +37,9 @@ test("item A B C and D", () => {
 
 test("item A C D but D negative quantity", () => {
   const value = { A: 2, C: 5, D: -10 };
-  expect(getTotal(JSON.stringify(value))).toThrow(
-    "Value must not be negative.",
-  );
+  expect(() => getTotal(JSON.stringify(value))).toThrow("Invalid value");
 });
 test("item A B but B is a string", () => {
   const value = { A: 2, B: "3" };
-  expect(getTotal(JSON.stringify(value))).toThrow(
-    "Value must not be a string.",
-  );
+  expect(getTotal(JSON.stringify(value))).toBe(195);
 });

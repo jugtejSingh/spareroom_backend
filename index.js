@@ -1,7 +1,7 @@
 import { getTotal } from "./checkout.js";
 
 try {
-  console.log(getTotal(JSON.stringify({ A: 6, B: 4, D: 2 })));
+  console.log(getTotal(JSON.stringify([{ code: "A", quantity: 6 }])));
 } catch (err) {
   console.log(err);
 }

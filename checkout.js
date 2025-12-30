@@ -1,4 +1,6 @@
 import dataFromDatabase from "./data_source.json" with { type: "json" };
+
+//Future Improvement, since its not an API, can allow parsing for both json and dictionary
 function jsonToDict(json) {
   try {
     return JSON.parse(json);
@@ -21,11 +23,11 @@ function computeItemPrices(dataFromUser) {
   }
 
   for (const [key, value] of Object.entries(dataFromUser)) {
-    const item = checkingValuePresentInDB(key);
-    if (typeof value === "undefined" || value <= 0) {
+    const item = checkingValuePresentInDB(value["code"]);
+    if (typeof value["quantity"] === "undefined" || value <= 0) {
       throw new Error("Invalid value");
     }
-    let quantity = value;
+    let quantity = value["quantity"];
 
     if (item["specials"]) {
       if (!Array.isArray(item.specials)) {
@@ -35,7 +37,7 @@ function computeItemPrices(dataFromUser) {
       }
       let quantityToCalculate = calculateSpecialPricing(
         item["specials"],
-        value,
+        quantity,
       );
 
       total += quantityToCalculate[0];
@@ -66,7 +68,6 @@ function calculateSpecialPricing(items, quantity) {
         Math.floor(quantity / items[i].quantity) * items[i].price,
         quantity % items[i].quantity,
       ];
-      break;
     }
   }
   return [0, quantity];
