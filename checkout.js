@@ -1,6 +1,10 @@
 import dataFromDatabase from "./data_source.json" with { type: "json" };
 function jsonToDict(json) {
-  return JSON.parse(json);
+  try {
+    return JSON.parse(json);
+  } catch {
+    throw new Error("Invalid JSON input");
+  }
 }
 
 //This function essentially mimics fetching from database, ideally would take in values and only return
@@ -9,26 +13,66 @@ function loadDataFromStorage() {
   return dataFromDatabase;
 }
 
-function computeItemPrices(dataFromUser, dataFromDatabase) {
-  for (const [key, value] of Object.entries(dataFromUser)) {
-    const item = dataFromDatabase["items"][key];
-    if (item["specials"]) {
-      calculateSpecialPricing(item["specials"]);
-    }
+function computeItemPrices(dataFromUser) {
+  let total = 0;
+
+  if (typeof dataFromUser !== "object" || dataFromUser === null) {
+    throw new Error("Invalid format of JSON");
   }
+
+  for (const [key, value] of Object.entries(dataFromUser)) {
+    const item = checkingValuePresentInDB(key);
+    if (typeof value === "undefined" || value <= 0) {
+      throw new Error("Invalid value");
+    }
+    let quantity = value;
+
+    if (item["specials"]) {
+      if (!Array.isArray(item.specials)) {
+        throw new Error(
+          `Invalid specials for ${key}, double check the database`,
+        );
+      }
+      let quantityToCalculate = calculateSpecialPricing(
+        item["specials"],
+        value,
+      );
+
+      total += quantityToCalculate[0];
+      quantity = quantityToCalculate[1];
+    }
+
+    total += quantity * item["unit_price"];
+  }
+
+  return total;
 }
 
-function calculateSpecialPricing(item) {
-  const array = [];
-  item.map((pricing) => {
-    array.push(pricing["quantity"]);
-  });
-  console.log(array.sort());
+function checkingValuePresentInDB(key) {
+  const dataFromDatabase = loadDataFromStorage();
+  const item = dataFromDatabase["items"][key];
+  if (item === undefined) {
+    throw new Error("Invalid Item, does not exist in the database");
+  }
+  return item;
+}
+
+function calculateSpecialPricing(items, quantity) {
+  items.sort((a, b) => b.quantity - a.quantity);
+
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].quantity <= quantity) {
+      return [
+        Math.floor(quantity / items[i].quantity) * items[i].price,
+        quantity % items[i].quantity,
+      ];
+      break;
+    }
+  }
+  return [0, quantity];
 }
 
 export function getTotal(json) {
   const dataFromUser = jsonToDict(json);
-  const dataFromDatabase = loadDataFromStorage();
-  const totalValues = computeItemPrices(dataFromUser, dataFromDatabase);
-  return totalValues;
+  return computeItemPrices(dataFromUser);
 }
