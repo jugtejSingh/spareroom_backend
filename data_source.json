@@ -2,23 +2,29 @@
   "items": {
     "A": {
       "unit_price": 50,
+      "specials": [
+        {
+          "quantity": 5,
+          "price": 200
+        },
+        {
+          "quantity": 3,
+          "price": 140
+        }
+      ]
+    },
+    "B": {
+      "unit_price": 35,
       "specials": {
-        "quantity": 3,
-        "price" : 140
+        "quantity": 2,
+        "price": 60
       }
+    },
+    "C": {
+      "unit_price": 25
+    },
+    "D": {
+      "unit_price": 12
     }
-  },
-  "B": {
-    "unit_price": 35,
-    "specials": {
-      "quantity": 2,
-      "price" : 60
-    }
-  },
-  "C": {
-    "unit_price": 25
-  },
-  "D": {
-    "unit_price": 12
   }
 }
