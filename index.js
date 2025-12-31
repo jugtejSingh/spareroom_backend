@@ -7,9 +7,10 @@ import DuplicationError from "./errors/duplication-error.js";
 try {
   console.log(
     getTotal([
-      { code: "A", quantity: "6" },
-      { code: "B", quantity: "2" },
-      { code: "E", quantity: "2" },
+      { code: "A", quantity: 3 },
+      { code: "B", quantity: 3 },
+      { code: "C", quantity: 1 },
+      { code: "D", quantity: 2 },
     ]),
   );
 } catch (error) {
