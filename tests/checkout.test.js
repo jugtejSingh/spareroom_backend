@@ -1,4 +1,4 @@
-import { getTotal } from "../checkout.js";
+import { computeItemPrices, getTotal } from "../checkout.js";
 import { inputValidation } from "../checkout.js";
 
 describe("full flow tests", () => {
@@ -55,7 +55,7 @@ describe("full flow tests", () => {
       { code: "A", quantity: 2 },
       { code: "B", quantity: "3" },
     ];
-    expect(getTotal(value)).toBe(195);
+    expect(() => getTotal(value)).toThrow();
   });
   test("item A B but B's quantity is incorrect", () => {
     const value = [
@@ -84,6 +84,18 @@ describe("unit tests", () => {
   });
 
   test("checking compute prices", () => {
-    expect(() => inputValidation({ 1: 1 })).toThrow();
+    expect(computeItemPrices([{ code: "A", quantity: 2 }])).toBe(100);
+  });
+
+  test("checking compute prices, incorrect quantity", () => {
+    expect(() => computeItemPrices([{ code: "A", quantity: 0 }])).toThrow();
+  });
+
+  test("checking compute prices, incorrect naming", () => {
+    expect(() => computeItemPrices([{ codee: "A", quantity: 2 }])).toThrow();
+  });
+
+  test("checking compute prices, invalid code", () => {
+    expect(() => computeItemPrices([{ code: "AA", quantity: 2 }])).toThrow();
   });
 });

@@ -1,8 +1,11 @@
 import dataFromDatabase from "./data_source.json" with { type: "json" };
+import ValidationError from "./errors/validation-error.js";
+import DuplicationError from "./errors/duplication-error.js";
+import InvalidItemError from "./errors/invalid-item-error.js";
 
 export function inputValidation(array) {
   if (!Array.isArray(array)) {
-    throw new Error("Invalid Input");
+    throw new ValidationError();
   }
   return array;
 }
@@ -23,12 +26,12 @@ export function computeItemPrices(dataFromUser) {
     let quantity = dataFromUser[i].quantity;
 
     if (setForDuplicateChecking.has(code)) {
-      throw new Error("Duplicate items");
+      throw new DuplicationError();
     }
     setForDuplicateChecking.add(code);
 
-    if (typeof quantity === "undefined" || quantity <= 0 || isNaN(quantity)) {
-      throw new Error("Invalid quantity");
+    if (typeof quantity !== "number" || quantity <= 0 || isNaN(quantity)) {
+      throw new ValidationError();
     }
 
     const item = checkingValuePresentInDB(code);
@@ -53,13 +56,12 @@ export function checkingValuePresentInDB(key) {
   const dataFromDatabase = loadDataFromStorage();
   const item = dataFromDatabase["items"][key];
   if (!item) {
-    throw new Error("Invalid Item, does not exist in the database");
+    throw new InvalidItemError();
   }
   return item;
 }
 
 export function calculateSpecialPricing(specialPricingItem, quantity) {
-  // Is this needed?
   specialPricingItem.sort((a, b) => b.quantity - a.quantity);
 
   for (let i = 0; i < specialPricingItem.length; i++) {
@@ -75,11 +77,6 @@ export function calculateSpecialPricing(specialPricingItem, quantity) {
 }
 
 export function getTotal(inputData) {
-  try {
-    inputValidation(inputData);
-    return computeItemPrices(inputData);
-  } catch (error) {
-    console.error(`Error occurred: ${error.message}`);
-    throw new Error(error.message);
-  }
+  inputValidation(inputData);
+  return computeItemPrices(inputData);
 }
