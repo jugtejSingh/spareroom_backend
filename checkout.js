@@ -71,7 +71,7 @@ export function calculateSpecialPricing(specialPricingItem, quantity) {
   specialPricingItem.sort((a, b) => b.quantity - a.quantity);
   let total = [0, quantity];
   for (let i = 0; i < specialPricingItem.length; i++) {
-    if (specialPricingItem[i].quantity <= quantity) {
+    if (specialPricingItem[i].quantity <= total[1]) {
       total[0] =
         total[0] +
         Math.floor(total[1] / specialPricingItem[i].quantity) *

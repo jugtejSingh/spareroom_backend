@@ -1,6 +1,5 @@
 import { getTotal } from "./checkout.js";
 import ValidationError from "./errors/validation-error.js";
-
 import InvalidItemError from "./errors/invalid-item-error.js";
 import DuplicationError from "./errors/duplication-error.js";
 
