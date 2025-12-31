@@ -83,6 +83,14 @@ export function calculateSpecialPricing(specialPricingItem, quantity) {
   return total;
 }
 
+/**
+ * Computes the rates for a cart
+ * @return {Number} sum
+ * @param inputData {Array<{code : string, quantity: number}>}
+ * @Throws{ValidationError}
+ * @Throws{DuplicationError}
+ * @Throws{InvalidItemError}
+ */
 export function getTotal(inputData) {
   inputValidation(inputData);
   return computeItemPrices(inputData);
