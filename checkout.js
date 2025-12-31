@@ -1,14 +1,10 @@
 import dataFromDatabase from "./data_source.json" with { type: "json" };
 
 function inputValidation(array) {
-  try {
-    if (!Array.isArray(array)) {
-      throw new Error();
-    }
-    return array;
-  } catch {
-    throw new Error("Invalid input");
+  if (!Array.isArray(array)) {
+    throw new Error("Invalid Input");
   }
+  return array;
 }
 
 //This function essentially mimics fetching from database, ideally would take in values and only return
@@ -20,17 +16,16 @@ function loadDataFromStorage() {
 function computeItemPrices(dataFromUser) {
   let total = 0;
 
-  const set = new Set();
+  const setForDuplicateChecking = new Set();
 
   for (let i = 0; i < dataFromUser.length; i++) {
     const code = dataFromUser[i].code;
+    let quantity = dataFromUser[i].quantity;
 
-    if (set.has(code)) {
+    if (setForDuplicateChecking.has(code)) {
       throw new Error("Duplicate items");
     }
-    set.add(code);
-
-    let quantity = dataFromUser[i]["quantity"];
+    setForDuplicateChecking.add(code);
 
     if (typeof quantity === "undefined" || quantity <= 0 || isNaN(quantity)) {
       throw new Error("Invalid quantity");
@@ -57,21 +52,22 @@ function computeItemPrices(dataFromUser) {
 function checkingValuePresentInDB(key) {
   const dataFromDatabase = loadDataFromStorage();
   const item = dataFromDatabase["items"][key];
-  if (item === undefined) {
+  if (!item) {
     throw new Error("Invalid Item, does not exist in the database");
   }
   return item;
 }
 
-function calculateSpecialPricing(items, quantity) {
+function calculateSpecialPricing(specialPricingItem, quantity) {
   // Is this needed?
-  const sortedItems = [...items].sort((a, b) => b.quantity - a.quantity);
+  specialPricingItem.sort((a, b) => b.quantity - a.quantity);
 
-  for (let i = 0; i < sortedItems.length; i++) {
-    if (sortedItems[i].quantity <= quantity) {
+  for (let i = 0; i < specialPricingItem.length; i++) {
+    if (specialPricingItem[i].quantity <= quantity) {
       return [
-        Math.floor(quantity / sortedItems[i].quantity) * sortedItems[i].price,
-        quantity % sortedItems[i].quantity,
+        Math.floor(quantity / specialPricingItem[i].quantity) *
+          specialPricingItem[i].price,
+        quantity % specialPricingItem[i].quantity,
       ];
     }
   }
@@ -79,6 +75,10 @@ function calculateSpecialPricing(items, quantity) {
 }
 
 export function getTotal(inputData) {
-  inputValidation(inputData);
-  return computeItemPrices(inputData);
+  try {
+    inputValidation(inputData);
+    return computeItemPrices(inputData);
+  } catch (error) {
+    console.log(`Error occurred: ${err.message}`);
+  }
 }
