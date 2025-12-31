@@ -1,6 +1,6 @@
 import dataFromDatabase from "./data_source.json" with { type: "json" };
 
-function inputValidation(array) {
+export function inputValidation(array) {
   if (!Array.isArray(array)) {
     throw new Error("Invalid Input");
   }
@@ -9,11 +9,11 @@ function inputValidation(array) {
 
 //This function essentially mimics fetching from database, ideally would take in values and only return
 // the relevant information back, but in this case since our database is a small json, we can load all of it in memory
-function loadDataFromStorage() {
+export function loadDataFromStorage() {
   return dataFromDatabase;
 }
 
-function computeItemPrices(dataFromUser) {
+export function computeItemPrices(dataFromUser) {
   let total = 0;
 
   const setForDuplicateChecking = new Set();
@@ -49,7 +49,7 @@ function computeItemPrices(dataFromUser) {
   return total;
 }
 
-function checkingValuePresentInDB(key) {
+export function checkingValuePresentInDB(key) {
   const dataFromDatabase = loadDataFromStorage();
   const item = dataFromDatabase["items"][key];
   if (!item) {
@@ -58,7 +58,7 @@ function checkingValuePresentInDB(key) {
   return item;
 }
 
-function calculateSpecialPricing(specialPricingItem, quantity) {
+export function calculateSpecialPricing(specialPricingItem, quantity) {
   // Is this needed?
   specialPricingItem.sort((a, b) => b.quantity - a.quantity);
 
@@ -79,6 +79,7 @@ export function getTotal(inputData) {
     inputValidation(inputData);
     return computeItemPrices(inputData);
   } catch (error) {
-    console.log(`Error occurred: ${err.message}`);
+    console.error(`Error occurred: ${error.message}`);
+    throw new Error(error.message);
   }
 }
