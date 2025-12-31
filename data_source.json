@@ -1,7 +1,7 @@
 {
   "items": {
     "A": {
-      "unit_price": 50,
+      "unitPrice": 50,
       "specials": [
         {
           "quantity": 3,
@@ -10,7 +10,7 @@
       ]
     },
     "B": {
-      "unit_price": 35,
+      "unitPrice": 35,
       "specials": [
         {
           "quantity": 2,
@@ -19,10 +19,10 @@
       ]
     },
     "C": {
-      "unit_price": 25
+      "unitPrice": 25
     },
     "D": {
-      "unit_price": 12
+      "unitPrice": 12
     }
   }
 }

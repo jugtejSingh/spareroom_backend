@@ -1,7 +1,13 @@
 import { getTotal } from "./checkout.js";
 
 try {
-  console.log(getTotal(JSON.stringify([{ code: "A", quantity: 6 }])));
+  // Not sure if this is meant to be a JSON yet
+  console.log(
+    getTotal([
+      { code: "A", quantity: "6" },
+      { code: "B", quantity: "2" },
+    ]),
+  );
 } catch (err) {
-  console.log(err);
+  console.log(`Error occurred: ${err.message}`);
 }

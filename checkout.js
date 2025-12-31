@@ -1,11 +1,13 @@
 import dataFromDatabase from "./data_source.json" with { type: "json" };
 
-//Future Improvement, since its not an API, can allow parsing for both json and dictionary
-function jsonToDict(json) {
+function inputValidation(array) {
   try {
-    return JSON.parse(json);
+    if (!Array.isArray(array)) {
+      throw new Error();
+    }
+    return array;
   } catch {
-    throw new Error("Invalid JSON input");
+    throw new Error("Invalid input");
   }
 }
 
@@ -18,23 +20,25 @@ function loadDataFromStorage() {
 function computeItemPrices(dataFromUser) {
   let total = 0;
 
-  if (typeof dataFromUser !== "object" || dataFromUser === null) {
-    throw new Error("Invalid format of JSON");
-  }
+  const set = new Set();
 
-  for (const [key, value] of Object.entries(dataFromUser)) {
-    const item = checkingValuePresentInDB(value["code"]);
-    if (typeof value["quantity"] === "undefined" || value <= 0) {
-      throw new Error("Invalid value");
+  for (let i = 0; i < dataFromUser.length; i++) {
+    const code = dataFromUser[i].code;
+
+    if (set.has(code)) {
+      throw new Error("Duplicate items");
     }
-    let quantity = value["quantity"];
+    set.add(code);
+
+    let quantity = dataFromUser[i]["quantity"];
+
+    if (typeof quantity === "undefined" || quantity <= 0 || isNaN(quantity)) {
+      throw new Error("Invalid quantity");
+    }
+
+    const item = checkingValuePresentInDB(code);
 
     if (item["specials"]) {
-      if (!Array.isArray(item.specials)) {
-        throw new Error(
-          `Invalid specials for ${key}, double check the database`,
-        );
-      }
       let quantityToCalculate = calculateSpecialPricing(
         item["specials"],
         quantity,
@@ -44,7 +48,7 @@ function computeItemPrices(dataFromUser) {
       quantity = quantityToCalculate[1];
     }
 
-    total += quantity * item["unit_price"];
+    total += quantity * item["unitPrice"];
   }
 
   return total;
@@ -60,20 +64,21 @@ function checkingValuePresentInDB(key) {
 }
 
 function calculateSpecialPricing(items, quantity) {
-  items.sort((a, b) => b.quantity - a.quantity);
+  // Is this needed?
+  const sortedItems = [...items].sort((a, b) => b.quantity - a.quantity);
 
-  for (let i = 0; i < items.length; i++) {
-    if (items[i].quantity <= quantity) {
+  for (let i = 0; i < sortedItems.length; i++) {
+    if (sortedItems[i].quantity <= quantity) {
       return [
-        Math.floor(quantity / items[i].quantity) * items[i].price,
-        quantity % items[i].quantity,
+        Math.floor(quantity / sortedItems[i].quantity) * sortedItems[i].price,
+        quantity % sortedItems[i].quantity,
       ];
     }
   }
   return [0, quantity];
 }
 
-export function getTotal(json) {
-  const dataFromUser = jsonToDict(json);
-  return computeItemPrices(dataFromUser);
+export function getTotal(inputData) {
+  inputValidation(inputData);
+  return computeItemPrices(inputData);
 }
